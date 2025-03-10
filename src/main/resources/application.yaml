@@ -1,0 +1,90 @@
+spring:
+  application:
+    name: Multitenant-Flyway-POC
+  jmx:
+    enabled: true
+  jpa:
+    database-platform: org.hibernate.dialect.PostgreSQLDialect
+    properties:
+      hibernate:
+        types:
+          jsonb: com.vladmihalcea.hibernate.type.json.JsonBinaryType
+
+  # Define two datasources using custom prefixes.
+  datasource:
+    primary:
+      url: jdbc:postgresql://localhost:5439/primarydb
+      username: postgres
+      password: primary
+      driver-class-name: org.postgresql.Driver
+    config:
+      url: jdbc:postgresql://localhost:5438/configdb
+      username: postgres
+      password: config
+      driver-class-name: org.postgresql.Driver
+
+  # Disable default Flyway auto-configuration so we can use our own beans.
+  flyway:
+    enabled: false
+
+# Externalize Flyway settings for each datasource.
+custom:
+  flyway:
+    primary:
+      baseline-version: 0
+      baselineOnMigrate: true
+      out-of-order: true
+      locations: classpath:db/migration/primary
+      table: primary_schema_history
+      url: jdbc:postgresql://localhost:5439/primarydb?currentSchema=prim
+      user: postgres
+      password: primary
+    config:
+      baseline-version: 0
+      baselineOnMigrate: true
+      out-of-order: true
+      locations: classpath:db/migration/config
+      table: config_schema_history
+      url: jdbc:postgresql://localhost:5438/configdb?currentSchema=config
+      user: postgres
+      password: config
+
+server:
+  port: 8095
+  servlet:
+    context-path: /multitenant-flyway-poc
+
+management:
+  endpoint:
+    health:
+      show-details: always
+  endpoints:
+    web:
+      exposure:
+        include: [info, health]
+  statsd:
+    metrics:
+      export:
+        enabled: false
+  health:
+    jms:
+      enabled: false
+
+app:
+  product: FLYWAYPOC
+  name: Multitenant FLyway POC
+  objectType: multitenant-flyway-poc
+  version: '@project.version@'
+
+features:
+  classic-tool-decommission:
+    enabled: true
+
+logging:
+  level:
+    root: INFO
+    org:
+      springframework: INFO
+      flywaydb: ERROR
+    apache:
+      kafka: INFO
