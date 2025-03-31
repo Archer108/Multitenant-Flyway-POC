@@ -1,4 +1,4 @@
-package com.poc.flyway.Multitenant_Flyway_POC.appConfig.apis;
+package com.adp.benefits.carrier.api.service.impl;
 
 import com.adp.benefits.carrier.api.service.IEvaluateStepService;
 import com.adp.benefits.carrier.api.service.IRuleExecutionService;
@@ -6,10 +6,16 @@ import com.adp.benefits.carrier.entity.client.ActionContext;
 import com.adp.benefits.carrier.entity.client.Message;
 import com.adp.benefits.carrier.entity.client.ProcessStepOutcome;
 import com.adp.benefits.carrier.entity.client.repository.ActionContextRepository;
-import com.adp.benefits.carrier.entity.client.repository.MessagesRepository;
 import com.adp.benefits.carrier.entity.client.repository.ProcessStepOutcomeRepository;
+import com.adp.benefits.carrier.entity.client.repository.MessagesRepository;
 import com.adp.benefits.carrier.entity.primary.*;
-import com.adp.benefits.carrier.entity.primary.repository.*;
+import com.adp.benefits.carrier.entity.primary.repository.AttributeRepository;
+import com.adp.benefits.carrier.entity.primary.repository.ClientStepOverrideRepository;
+import com.adp.benefits.carrier.entity.primary.repository.ProcStepAttrAssocRepository;
+import com.adp.benefits.carrier.entity.primary.repository.ProcStepAttrRuleAssocRepository;
+import com.adp.benefits.carrier.entity.primary.repository.ProcessRepository;
+import com.adp.benefits.carrier.entity.primary.repository.ProcessStepRepository;
+import com.adp.benefits.carrier.entity.primary.repository.RuleRepository;
 import com.adp.benefits.carrier.enums.Status;
 import com.adp.benefits.carrier.model.EvaluateStepRequest;
 import com.adp.benefits.carrier.model.EvaluateStepResponse;
@@ -79,9 +85,10 @@ public class EvaluateStepServiceImpl implements IEvaluateStepService {
 
         // 3. Find or Create ProcessStepOutcome
         ProcessStepOutcome stepOutcome = findOrCreateProcessStepOutcome(request, processStep);
-        log.info("ProcessStepOutcome {} retrieved/created with status: {}.", stepOutcome.getProcessStepOutcomeId(), stepOutcome.getStatus());
+        log.info("ProcessStepOutcome {} retrieved/created with status: {}.",
+                stepOutcome.getProcessStepOutcomeId(), stepOutcome.getStatus());
 
-        // 4. Check for Client Step Override (skip, pause, etc.)
+        // 4. Check for Client Step Override
         boolean skipStep = checkClientStepOverride(request.getClientId(), processStep.getProcessStepId());
         if (skipStep) {
             log.info("Client step override indicates skipping the step.");
@@ -107,9 +114,8 @@ public class EvaluateStepServiceImpl implements IEvaluateStepService {
             log.warn("Rule failures encountered. Setting status to ERROR.");
         }
 
-        // 8. Determine next step (if any) and ensure it's non-null
+        // 8. Determine next step and update outcome
         String nextStepId = determineNextStepId(stepOutcome, processStep, errorMessages);
-        // Make sure nextStepId is non-null; use an empty string if there's no next step.
         if (nextStepId == null) {
             nextStepId = "";
             log.info("No valid next step determined; defaulting to empty string.");
@@ -167,13 +173,10 @@ public class EvaluateStepServiceImpl implements IEvaluateStepService {
                         request.getTransmissionId(),
                         request.getProcessStepId()
                 );
-
         if (existing.isPresent()) {
             log.info("Existing ProcessStepOutcome found for correlationId: {}.", request.getCorrelationId());
             return existing.get();
         }
-
-        // Create new outcome with default nextStepId (non-null, using empty string as default)
         ProcessStepOutcome newOutcome = ProcessStepOutcome.builder()
                 .processStepOutcomeId(UUID.randomUUID().toString())
                 .correlationId(request.getCorrelationId())
@@ -181,18 +184,15 @@ public class EvaluateStepServiceImpl implements IEvaluateStepService {
                 .clientId(request.getClientId())
                 .processStepId(processStep.getProcessStepId())
                 .status(Status.IN_PROGRESS)
-                .nextStepId("") // default non-null value
+                .nextStepId("")
                 .createdAt(new Date())
                 .updatedAt(new Date())
                 .build();
-
         log.info("Creating new ProcessStepOutcome with ID: {}", newOutcome.getProcessStepOutcomeId());
         return processStepOutcomeRepository.save(newOutcome);
     }
 
     private boolean checkClientStepOverride(String clientId, String processStepId) {
-        // Uncomment and implement actual override lookup if needed.
-        // For now, log and return false.
         log.info("Checking for client step override for clientId: {} and processStepId: {}.", clientId, processStepId);
         return false;
     }
@@ -200,7 +200,6 @@ public class EvaluateStepServiceImpl implements IEvaluateStepService {
     private void finalizeSkippedStep(ProcessStepOutcome stepOutcome, ProcessStep processStep) {
         log.info("Finalizing skipped step for ProcessStepOutcome {}.", stepOutcome.getProcessStepOutcomeId());
         stepOutcome.setStatus(Status.SKIPPED);
-        // Set nextStepId to a default non-null value (empty string)
         stepOutcome.setNextStepId("");
         stepOutcome.setUpdatedAt(new Date());
         processStepOutcomeRepository.save(stepOutcome);
@@ -208,19 +207,14 @@ public class EvaluateStepServiceImpl implements IEvaluateStepService {
 
     private void storeActionContext(ProcessStepOutcome stepOutcome, JsonNode payload) {
         String transmissionId = stepOutcome.getTransmissionId();
-
-        // Check if an ActionContext with this transmissionId already exists in the collection.
         Optional<ActionContext> existing = stepOutcome.getActionContexts().stream()
                 .filter(ac -> transmissionId.equals(ac.getTransmissionId()))
                 .findFirst();
-
         if (existing.isPresent()) {
-            // Update the payload if the ActionContext is already present.
             ActionContext actionContext = existing.get();
             actionContext.setPayload(payload.toString());
             log.info("Updated existing ActionContext with transmissionId: {}", transmissionId);
         } else {
-            // Create a new ActionContext and add it.
             ActionContext actionContext = ActionContext.builder()
                     .transmissionId(transmissionId)
                     .processStepOutcomeId(stepOutcome.getProcessStepOutcomeId())
@@ -233,55 +227,39 @@ public class EvaluateStepServiceImpl implements IEvaluateStepService {
 
     private List<String> runAttributeRules(ProcessStep processStep, JsonNode payload, ProcessStepOutcome stepOutcome) {
         List<String> errorMessages = new ArrayList<>();
-
         log.info("Starting rule evaluation for ProcessStep {}.", processStep.getProcessStepId());
-        // 1. Find attribute associations for this step
         List<ProcStepAttrAssoc> assocList = procStepAttrAssocRepository
                 .findByProcessStepIdAndEnabledIn(processStep.getProcessStepId(), true);
         log.info("Found {} attribute associations.", assocList.size());
-
-        // 2. For each attribute association, get the rule associations
         for (ProcStepAttrAssoc assoc : assocList) {
             List<ProcStepAttrRuleAssoc> ruleAssocs = procStepAttrRuleAssocRepository
                     .findByProcStepAttrAssocIdAndEnabledIn(assoc.getProcStepAttrAssocId(), true);
             log.info("For association {} found {} rule associations.", assoc.getProcStepAttrAssocId(), ruleAssocs.size());
-
-            // 3. Evaluate each rule
             for (ProcStepAttrRuleAssoc ruleAssoc : ruleAssocs) {
                 Rule rule = ruleAssoc.getRule();
-                boolean passed = ruleExecutionService.evaluate(rule, payload);
-                log.info("Evaluating rule '{}' (condition: {}) resulted in: {}", rule.getName(), rule.getRuleCondId(), passed ? "PASSED" : "FAILED");
-
-                if (!passed) {
-                    // 4. Get the default message from the rule
-                    PrimaryMessage primaryMessage = rule.getDefaultMessage();
-                    String msgBody = (primaryMessage != null) ? primaryMessage.getBody() : "Rule failed";
-
-                    // 5. Persist a runtime message using the existing Message entity
-                    Message runtimeMsg = Message.builder()
-                            .messageId(UUID.randomUUID().toString())
-                            .processStepOutcomeId(stepOutcome.getProcessStepOutcomeId())
-                            .message(msgBody)
-                            .build();
-                    messageRepository.save(runtimeMsg);
-                    log.info("Saved runtime message for rule failure: {}", msgBody);
-
-                    // 6. Add the error message to the list
-                    errorMessages.add(msgBody);
+                List<String> ruleErrors = ruleExecutionService.evaluate(rule, payload);
+                if (!ruleErrors.isEmpty()) {
+                    for (String msg : ruleErrors) {
+                        Message runtimeMsg = Message.builder()
+                                .messageId(UUID.randomUUID().toString())
+                                .processStepOutcomeId(stepOutcome.getProcessStepOutcomeId())
+                                .message(msg)
+                                .build();
+                        messageRepository.save(runtimeMsg);
+                        log.info("Saved runtime message for rule failure: {}", msg);
+                    }
+                    errorMessages.addAll(ruleErrors);
                 }
             }
         }
-
         return errorMessages;
     }
 
     private String determineNextStepId(ProcessStepOutcome stepOutcome, ProcessStep processStep, List<String> errorMessages) {
-        // Example logic: if there are errors, return an empty string; otherwise, return a default next step.
         if (!errorMessages.isEmpty()) {
-            log.info("Errors detected. No next step will be set.");
+            log.info("Errors detected. Next step will be set to error fix step.");
             return "some_fix_error_next_step_id";
         }
-        // Replace "some_next_step_id" with logic to determine the actual next step.
         String nextStep = "some_next_step_id";
         log.info("No errors detected. Next step determined as: {}", nextStep);
         return nextStep;
