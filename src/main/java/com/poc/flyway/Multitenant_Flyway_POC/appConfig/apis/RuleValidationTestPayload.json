@@ -1,0 +1,375 @@
+{
+  "aoid": "G37RYD2H1A7BD8BF",
+  "ooid": "98BE5B782270036B",
+  "correlationId": "12345678-4444-2222-3333-123456789012",
+  "schemaVersion": "1.00",
+  "beneficiaries": [
+    {
+      "beneficiaryInfo": {
+        "beneficiaryNumber": 0,
+        "beneficiaryType": "Person",
+        "relationship": "Child1"
+      },
+      "contact": {
+        "addresses": [
+          {
+            "street": "123 Main St",
+            "city": "Anytown",
+            "state": "CA",
+            "postalCode": "12345",
+            "country": "USA"
+          }
+        ]
+      },
+      "hash": "fwerer4545324",
+      "name": {
+        "firstName": "John",
+        "lastName": "Doe"
+      },
+      "person": {
+        "dateOfBirth": "1990-01-01",
+        "gender": "Male",
+        "socialSecurityNumber": "224-56-6898"
+      }
+    },
+    {
+      "beneficiaryInfo": {
+        "beneficiaryNumber": 0,
+        "beneficiaryType": "Person",
+        "relationship": "Child2"
+      },
+      "contact": {
+        "addresses": [
+          {
+            "street": "123 Main St",
+            "city": "Anytown",
+            "state": "CA",
+            "postalCode": "12345",
+            "country": "USA"
+          }
+        ]
+      },
+      "hash": "fwerer4545365",
+      "name": {
+        "firstName": "Simran",
+        "lastName": "Doe"
+      },
+      "person": {
+        "dateOfBirth": "1990-01-01",
+        "gender": "F",
+        "socialSecurityNumber": "224-56-6898"
+      }
+    }
+  ],
+  "dependents": [
+    {
+      "contacts": {
+        "addresses": [
+          {
+            "street": "456 Elm St",
+            "city": "Anytown",
+            "state": "CA",
+            "postalCode": "12345",
+            "country": "USA"
+          }
+        ]
+      },
+      "name": {
+        "firstName": "Janet",
+        "lastName": "Doe"
+      },
+      "personal": {
+        "dateOfBirth": "2010-01-01",
+        "gender": "F",
+        "relationship": "Child",
+        "socialSecurityNumber": "447-11-9877",
+        "student": true,
+        "contactNumber": {
+          "phone": [
+            {
+              "type": "Home",
+              "number": "123-456-7890"
+            },
+            {
+              "type": "Work",
+              "number": "987-654-3210"
+            }
+          ]
+        }
+      },
+      "hash": "werer4545324",
+      "medicare": {}
+    },
+    {
+      "contacts": {
+        "addresses": [
+          {
+            "street": "456 Elm St",
+            "city": "Anytown",
+            "state": "CA",
+            "postalCode": "12345",
+            "country": "USA"
+          }
+        ]
+      },
+      "name": {
+        "firstName": "Jennifer",
+        "lastName": "Doe"
+      },
+      "personal": {
+        "dateOfBirth": "1980-01-01",
+        "gender": "F",
+        "relationship": "Spouse",
+        "socialSecurityNumber": "447-11-9867",
+        "student": true
+      },
+      "hash": "werer4545324",
+      "medicare": {}
+    },
+    {
+      "contacts": {
+        "addresses": [
+          {
+            "street": "456 Elm St",
+            "city": "Anytown",
+            "state": "CA",
+            "postalCode": "12345",
+            "country": "USA"
+          }
+        ]
+      },
+      "name": {
+        "firstName": "Johny",
+        "lastName": "Doe"
+      },
+      "personal": {
+        "dateOfBirth": "2012-01-01",
+        "gender": "M",
+        "relationship": "Child",
+        "socialSecurityNumber": "547-11-9876",
+        "student": true,
+        "contactNumber": {
+          "phone": [
+            {
+              "type": "Home",
+              "number": "123-456-7860"
+            },
+            {
+              "type": "Work",
+              "number": "987-654-3310"
+            }
+          ]
+        }
+      },
+      "hash": "werer4545324",
+      "medicare": {}
+    }
+  ],
+  "participantRevisions": [
+    {
+      "contact": {
+        "addresses": [
+          {
+            "street": "789 Oak St",
+            "city": "Anytown",
+            "state": "CA",
+            "postalCode": "12345",
+            "country": "USA"
+          }
+        ],
+        "emailAddress": "johndoe@example.com",
+        "phoneNumbers": [
+          {
+            "phoneNumberType": "Home",
+            "phoneNumber": "123-456-7890"
+          },
+          {
+            "phoneNumberType": "Work",
+            "phoneNumber": "987-654-3210"
+          }
+        ]
+      },
+      "custom": {
+        "clientDefinitionOrganizationCode": "1234567890",
+        "clientDefinedStatus": "Info"
+      },
+      "employment": {
+        "employmentStatus": "Employed",
+        "employmentType": "Full-Time",
+        "occupation": "Software Developer",
+        "benefitEligibilityGroup": "003",
+        "participantType": "AE"
+      },
+      "hash": "werer4545324",
+      "id": {
+        "employeeId": "000000YUK",
+        "fileNumber": "12334565",
+        "participantId": "GHFY89JKU01",
+        "subscriberType": "AE"
+      },
+      "job": {
+        "jobCode": "01-5050"
+      },
+      "leave": {
+        "leaveType": "L",
+        "scheduleReturnWork": "2024-12-31",
+        "leaveOfAbsenseStartDate": "2024-12-30"
+      },
+      "medicare": {
+        "eligibleReason": "N"
+      },
+      "name": {
+        "firstName": "Johns",
+        "lastName": "Doe",
+        "middleName": "Jane",
+        "nameSuffix": "Sr."
+      },
+      "payroll": {
+        "payrollId": "1234567890",
+        "payrollType": "Full-Time",
+        "payrollGroup": "001",
+        "weeklyHours": "48"
+      },
+      "personal": {
+        "dateOfBirth": "1990-01-01",
+        "gender": "Male",
+        "smoker": false,
+        "socialSecurityNumber": "447119876",
+        "maritalStatus": "M"
+      },
+      "contactNumber": {
+        "phone": [
+          {
+            "type": "Home",
+            "number": "123-456-5890"
+          },
+          {
+            "type": "Work",
+            "number": "987-654-2210"
+          }
+        ]
+      },
+      "validFrom": "2024-07-01",
+      "validTo": "9999-12-31"
+    }
+  ],
+  "planTypes": [
+    {
+      "enrollmentRevisions": [
+        {
+          "enrollment": {
+            "current": {
+              "carrierName": "NO_CARRIER_FOUND",
+              "cobraIn": false,
+              "use1CGAPI": false,
+              "costs": {
+                "employerContribution": {
+                  "preTax": {
+                    "payPeriod": 0.0,
+                    "annual": 0.0,
+                    "monthly": 0.0
+                  }
+                },
+                "participantAmount": {
+                  "postTax": {
+                    "payPeriod": 0.0,
+                    "annual": 0.0,
+                    "monthly": 0.0
+                  }
+                }
+              },
+              "courtOrdered": false,
+              "coverageAmountStartDate": "2024-07-01",
+              "electedCoverageAmount": 0.0,
+              "electedGoalAmount": 0.0,
+              "electedOptionId": "ADDWAIVE",
+              "electedOptionName": "ADDWAIVE",
+              "electionSource": "3",
+              "enrollingEvent": "New Hire",
+              "enrollingEventDate": "2024-07-01",
+              "goalAmountEnd": "2024-12-31",
+              "goalAMountStart": "2024-07-01",
+              "hippaIn": false,
+              "inforceCoverageAmount": 0.0,
+              "inforceGoalAmount": 0.0,
+              "inforceOptionId": "ADDWAIVE",
+              "inforceOptionName": "ADDWAIVE",
+              "optionEffectiveStart": "2024-07-01",
+              "isCovered": false
+            }
+          },
+          "participantHash": "c112hsvdjkcs231",
+          "validFrom": "2024-07-01",
+          "validTo": "9999-12-31",
+          "ignoreCarrierProcessing": false
+        }
+      ],
+      "standardBenefitArea": "ADD",
+      "standardBenefitAreaName": "Optional AD&D"
+    },
+    {
+      "enrollmentRevisions": [
+        {
+          "enrollment": {
+            "current": {
+              "carrierName": "Aetna",
+              "cobraIn": false,
+              "use1CGAPI": true,
+              "costs": {
+                "creditAmount": {
+                  "preTax": {
+                    "payPeriod": 0.0,
+                    "annual": 0.0,
+                    "monthly": 0.0
+                  }
+                },
+                "employerContribution": {
+                  "preTax": {
+                    "payPeriod": 3.85,
+                    "annual": 100.0,
+                    "monthly": 8.33
+                  }
+                },
+                "participantAmount": {
+                  "preTax": {
+                    "payPeriod": 57000.69,
+                    "annual": 1500.0,
+                    "monthly": 125.0
+                  }
+                },
+                "surchargeAmount": {
+                  "preTax": {
+                    "payPeriod": 0.0,
+                    "annual": 0.0,
+                    "monthly": 0.0
+                  }
+                }
+              },
+              "courtOrdered": false,
+              "coverageLevel": "PPONLY",
+              "coverageAmountStartDate": "2024-07-01",
+              "electedOptionId": "AetnaPPO",
+              "electedOptionName": "AetnaPPO",
+              "electionSource": "1",
+              "enrollingEvent": "New Hire",
+              "enrollingEventDate": "2024-07-01",
+              "hippaIn": false,
+              "inforceOptionId": "AetnaPPO",
+              "inforceOptionName": "AetnaPPO",
+              "optionEffectiveStart": "2024-07-01",
+              "originalCoverageDate": "2024-07-01",
+              "isCovered": false
+            }
+          },
+          "participantHash": "c1127jhgjkcs231",
+          "validFrom": "2024-07-01",
+          "validTo": "2024-06-30",
+          "ignoreCarrierProcessing": false
+        }
+      ],
+      "standardBenefitArea": "MEDICAL",
+      "standardBenefitAreaName": "MedicalPri"
+    }
+  ],
+  "testEnvironment": true
+}
