@@ -1,0 +1,127 @@
+spring:
+  main:
+    web-application-type: reactive
+  jmx:
+    enabled: true
+  application:
+    name: baas-client-process-manager
+  jpa:
+    database-platform: org.hibernate.dialect.PostgreSQLDialect
+    properties:
+      hibernate:
+        types:
+          jsonb: com.vladmihalcea.hibernate.type.json.JsonBinaryType
+
+  datasource:
+    primary:
+      url: jdbc:postgresql://localhost:5443/primary_local
+      username: cpm_appuser
+      password: LDAonmsJ0LOnB/+xfYpHzaVYad3lg0p8p91kV4Za62CXwxFz
+      driver-class-name: org.postgresql.Driver
+    clients:
+      username: cpm_appuser
+      password: LDAonmsJ0LOnB/+xfYpHzaVYad3lg0p8p91kV4Za62CXwxFz
+
+
+  flyway:
+    enabled: false
+
+custom:
+  flyway:
+    primary:
+      baseline-version: 0
+      baselineOnMigrate: true
+      out-of-order: true
+      locations: classpath:db/migration/primary
+      table: primary_schema_history
+      url: jdbc:postgresql://localhost:5443/primary_local?currentSchema=bcpm_primary_schema
+      user: cpm_appuser
+      password: LDAonmsJ0LOnB/+xfYpHzaVYad3lg0p8p91kV4Za62CXwxFz
+    clients:
+      baseline-version: 0
+      baselineOnMigrate: true
+      out-of-order: true
+      locations: classpath:db/migration/client
+      table: client_schema_history
+      user: cpm_appuser
+      password: LDAonmsJ0LOnB/+xfYpHzaVYad3lg0p8p91kV4Za62CXwxFz
+
+# Remove any “server.servlet.context-path” entry (or set it to "/")
+server:
+  port: 9091
+  servlet:
+    context-path: /
+
+springdoc:
+  packages-to-scan: com.adp.benefits.carrier
+  swagger-ui:
+    path: /swagger-ui.html
+    disable-swagger-default-url: true
+  default-produces-media-type: application/json
+
+management:
+  endpoint:
+    health:
+      show-details: always
+    metrics:
+      enabled: true
+    prometheus:
+      enabled: true
+
+  endpoints:
+    web:
+      exposure:
+        include: [ health,info,metrics,prometheus ]
+
+  metrics:
+    web:
+      server:
+        request:
+          autotime:
+            enabled: false    # if you’re using your custom filter
+
+    tags:
+      application: ${spring.application.name}
+
+    export:
+      simple:
+        enabled: true   # or `prometheus.enabled: true` if you use Prometheus registry
+
+  statsd:
+    metrics:
+      export:
+        enabled: false
+
+  health:
+    jms:
+      enabled: false
+
+app:
+  product: NASBEN
+  name: Baas Client Process Manager
+  objectType: bass-client-process-manager
+  version: '@project.version@'
+
+
+features:
+  classic-tool-decommission:
+    enabled: true
+
+logging:
+  register-shutdown-hook: false
+  config: classpath:logback-spring.xml
+  level:
+    root: INFO
+    org:
+      springframework: INFO
+      flywaydb: ERROR
+    apache:
+      kafka: INFO
+    com.adp.benefits.carrier.config.TenantDatabaseLoader: DEBUG
+    com.adp.benefits.carrier.config.MultiTenantDataSource: DEBUG
+
+cpm:
+  api-timeouts:
+    evaluate-step: 50000ms
+    update-step: 50000ms
+    logError-step: 50000ms

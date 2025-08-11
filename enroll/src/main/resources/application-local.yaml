@@ -1,0 +1,133 @@
+spring:
+  main:
+    web-application-type: reactive
+  jmx:
+    enabled: true
+  application:
+    name: baas-client-process-manager
+  jpa:
+    database-platform: org.hibernate.dialect.PostgreSQLDialect
+    properties:
+      hibernate:
+        types:
+          jsonb: com.vladmihalcea.hibernate.type.json.JsonBinaryType
+
+  datasource:
+    primary:
+      url: jdbc:postgresql://localhost:5443/primary_local
+      username: cpm_appuser
+      password: LDAonmsJ0LOnB/+xfYpHzaVYad3lg0p8p91kV4Za62CXwxFz
+      driver-class-name: org.postgresql.Driver
+    clients:
+      username: cpm_appuser
+      password: LDAonmsJ0LOnB/+xfYpHzaVYad3lg0p8p91kV4Za62CXwxFz
+
+  flyway:
+    enabled: false
+
+custom:
+  flyway:
+    primary:
+      baseline-version: 0
+      baselineOnMigrate: true
+      out-of-order: true
+      locations: classpath:db/migration/primary
+      table: primary_schema_history
+      url: jdbc:postgresql://localhost:5443/primary_local?currentSchema=bcpm_primary_schema
+      user: cpm_appuser
+      password: LDAonmsJ0LOnB/+xfYpHzaVYad3lg0p8p91kV4Za62CXwxFz
+    clients:
+      baseline-version: 0
+      baselineOnMigrate: true
+      out-of-order: true
+      locations: classpath:db/migration/client
+      table: client_schema_history
+      user: cpm_appuser
+      password: LDAonmsJ0LOnB/+xfYpHzaVYad3lg0p8p91kV4Za62CXwxFz
+
+# Remove any “server.servlet.context-path” entry (or set it to "/")
+server:
+  port: 9099
+  servlet:
+    context-path: /
+
+springdoc:
+  api-docs:
+    path: /v3/api-docs
+  swagger-ui:
+    path: /swagger-ui.html
+    disable-swagger-default-url: true
+    url: /v3/api-docs/baas-api
+
+management:
+  endpoint:
+    health:
+      show-details: always
+    metrics:
+      enabled: true
+    prometheus:
+      enabled: true
+  endpoints:
+    web:
+      exposure:
+        include: [ health,info ]
+  metrics:
+    web:
+      server:
+        request:
+          autotime:
+            enabled: false
+    tags:
+      application: ${spring.application.name}
+    export:
+      simple:
+        enabled: true
+  statsd:
+    metrics:
+      export:
+        enabled: false
+  health:
+    jms:
+      enabled: false
+
+app:
+  product: NASBEN
+  name: Baas Client Process Manager
+  objectType: bass-client-process-manager
+  version: '@project.version@'
+
+features:
+  classic-tool-decommission:
+    enabled: true
+
+logging:
+  register-shutdown-hook: false
+  config: classpath:logback-spring.xml
+  level:
+    root: INFO
+    org:
+      springframework: INFO
+      flywaydb: ERROR
+    apache:
+      kafka: INFO
+    com.adp.benefits.carrier.config.TenantDatabaseLoader: DEBUG
+    com.adp.benefits.carrier.config.MultiTenantDataSource: DEBUG
+    # add focused logs for the enrollment feature
+    com.adp.benefits.carrier.api.service.EnrollmentInfoService: INFO
+    com.adp.benefits.carrier.api.service.EnrollmentInfoPerTenantService: INFO
+
+cpm:
+  api-timeouts:
+    evaluate-step: 50000ms
+    update-step: 50000ms
+    logError-step: 50000ms
+
+  # 👇 NEW: enrollment pagination + caffeine cache tuning
+  enrollment:
+    pagination:
+      default-page-size: 100   # UI default
+      max-page-size: 500       # server-side guardrail
+      epsilon-per-tenant: 8    # small over-fetch used during k-way merge
+    cache:
+      maxSize: 200             # max number of (window x size x tenantSet) cursor-books in cache
+      ttl-minutes: 10          # expire after access to release unused cursor-books sooner
