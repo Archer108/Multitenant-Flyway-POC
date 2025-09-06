@@ -1,13 +1,13 @@
 package com.poc.flyway.Multitenant_Flyway_POC.config;
 
 import javax.sql.DataSource;
+import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.boot.autoconfigure.jdbc.DataSourceProperties;
 import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Primary;
-import org.springframework.beans.factory.annotation.Qualifier;
-import lombok.RequiredArgsConstructor;
 
 @Configuration
 @RequiredArgsConstructor
@@ -22,7 +22,8 @@ public class DataSourceConfig {
 
     @Primary
     @Bean(name = "primaryDataSource")
-    public DataSource primaryDataSource(@Qualifier("primaryDataSourceProperties") DataSourceProperties properties) {
+    public DataSource primaryDataSource(
+            @Qualifier("primaryDataSourceProperties") DataSourceProperties properties) {
         return properties.initializeDataSourceBuilder().build();
     }
 
@@ -33,7 +34,8 @@ public class DataSourceConfig {
     }
 
     @Bean(name = "configDataSource")
-    public DataSource configDataSource(@Qualifier("configDataSourceProperties") DataSourceProperties properties) {
+    public DataSource configDataSource(
+            @Qualifier("configDataSourceProperties") DataSourceProperties properties) {
         return properties.initializeDataSourceBuilder().build();
     }
 }

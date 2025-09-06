@@ -7,8 +7,7 @@ import org.springframework.boot.autoconfigure.flyway.FlywayAutoConfiguration;
 @SpringBootApplication(exclude = {FlywayAutoConfiguration.class})
 public class MultitenantFlywayPocApplication {
 
-	public static void main(String[] args) {
-		SpringApplication.run(MultitenantFlywayPocApplication.class, args);
-	}
-
+    public static void main(String[] args) {
+        SpringApplication.run(MultitenantFlywayPocApplication.class, args);
+    }
 }
